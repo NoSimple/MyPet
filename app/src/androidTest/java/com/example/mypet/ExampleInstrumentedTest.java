@@ -1,4 +1,4 @@
-package com.example.mypetnews;
+package com.example.mypet;
 
 import android.content.Context;
 

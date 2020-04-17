@@ -1,11 +1,27 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="AppThemeLight" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="themeName">AppThemeLight</item>
+        <item name="android:colorPrimary">@color/primary</item>
+        <item name="android:colorPrimaryDark">@color/primaryDark</item>
+        <item name="android:textColor">@color/text</item>
+        <item name="android:textColorSecondary">@color/textSecondary</item>
+        <item name="android:windowActionModeOverlay">false</item>
+        <item name="listDividerColor">@color/listDivider</item>
+        <item name="listingTitleTextColor">@color/listingTitleText</item>
+        <item name="appBarTextColor">@color/appBarTextColor</item>
+        <item name="hiddenCommentCountTextColor">@color/hiddenCommentCountTextColor</item>
+        <!-- App Bar -->
+        <item name="colorPrimary">@color/primary</item>
+        <!-- Material Drawer -->
     </style>
 
 </resources>
