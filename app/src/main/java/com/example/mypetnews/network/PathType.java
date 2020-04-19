@@ -2,11 +2,11 @@ package com.example.mypetnews.network;
 
 public enum PathType {
 
-    TOP("top"),
-    NEW("new"),
-    ASK("ask"),
-    SHOW("show"),
-    JOBS("jobs");
+    TOP("Top"),
+    NEW("New"),
+    ASK("Ask"),
+    SHOW("Show"),
+    JOBS("Jobs");
 
     private String pathName;
 

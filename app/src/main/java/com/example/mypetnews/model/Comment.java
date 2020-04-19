@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Date;
 import java.util.List;
 
 public final class Comment implements Parcelable {
@@ -18,23 +19,31 @@ public final class Comment implements Parcelable {
     private String text;
     @SerializedName("time")
     @Expose
-    private String time;
+    private Date time;
     @SerializedName("comments")
     @Expose
-    private List<Comment> comments = null;
+    private List<Comment> comments;
     @SerializedName("commentCount")
     @Expose
     private Integer commentCount;
 
+    private Integer margin;
+
     protected Comment(Parcel in) {
         author = in.readString();
         text = in.readString();
-        time = in.readString();
+        long tmpDate = in.readLong();
+        this.time = tmpDate == -1 ? null : new Date(tmpDate);
         comments = in.createTypedArrayList(Comment.CREATOR);
         if (in.readByte() == 0) {
             commentCount = null;
         } else {
             commentCount = in.readInt();
+        }
+        if (in.readByte() == 0) {
+            margin = null;
+        } else {
+            margin = in.readInt();
         }
     }
 
@@ -66,11 +75,11 @@ public final class Comment implements Parcelable {
         this.text = text;
     }
 
-    public String getTime() {
+    public Date getTime() {
         return time;
     }
 
-    public void setTime(String time) {
+    public void setTime(Date time) {
         this.time = time;
     }
 
@@ -90,6 +99,14 @@ public final class Comment implements Parcelable {
         this.commentCount = commentCount;
     }
 
+    public Integer getMargin() {
+        return margin;
+    }
+
+    public void setMargin(Integer margin) {
+        this.margin = margin;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -99,13 +116,19 @@ public final class Comment implements Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(author);
         parcel.writeString(text);
-        parcel.writeString(time);
+        parcel.writeLong(time != null ? time.getTime() : -1);
         parcel.writeTypedList(comments);
         if (commentCount == null) {
             parcel.writeByte((byte) 0);
         } else {
             parcel.writeByte((byte) 1);
             parcel.writeInt(commentCount);
+        }
+        if (margin == null) {
+            parcel.writeByte((byte) 0);
+        } else {
+            parcel.writeByte((byte) 1);
+            parcel.writeInt(margin);
         }
     }
 }

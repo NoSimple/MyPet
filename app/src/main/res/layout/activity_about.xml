@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/story"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context=".view.AboutActivity">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -12,61 +10,67 @@
         android:layout_height="wrap_content">
 
         <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
+            android:id="@+id/tool_bar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            android:theme="@style/Base.ThemeOverlay.AppCompat.Dark" />
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="@dimen/activityHorizontalMargin">
+        android:layout_centerInParent="true"
+        android:orientation="vertical">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:text="@string/aboutTitle"
-            android:textSize="20sp" />
+            android:layout_marginBottom="32dp"
+            android:gravity="center"
+            android:text="@string/splash_title_text"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="22sp"
+            android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/aboutText"
+            android:id="@+id/text_version_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:text="@string/aboutText" />
+            android:layout_marginBottom="4dp"
+            android:gravity="center"
+            android:textColor="@color/colorBlack"
+            android:textSize="18sp"
+            tools:text="Version name: 1.0" />
+
+        <TextView
+            android:id="@+id/text_version_code"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:gravity="center"
+            android:textColor="@color/colorBlack"
+            android:textSize="18sp"
+            tools:text="Version code: 1.0" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:text="@string/feedback"
-            android:textSize="20sp" />
+            android:layout_marginBottom="4dp"
+            android:gravity="center"
+            android:text="@string/production_text"
+            android:textColor="@color/colorBlack"
+            android:textSize="16sp" />
 
         <TextView
-            android:id="@+id/feedbackText"
+            android:id="@+id/text_year"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:text="@string/feedbackText" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:text="@string/contributing"
-            android:textSize="20sp" />
-
-        <TextView
-            android:id="@+id/contributingText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/contributingText" />
+            android:gravity="center"
+            android:textColor="@color/colorBlack"
+            android:textSize="16sp"
+            tools:text="2020" />
 
     </LinearLayout>
 
-</LinearLayout>
+</RelativeLayout>

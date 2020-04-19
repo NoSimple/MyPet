@@ -2,8 +2,6 @@ package com.example.mypetnews.adapter;
 
 import android.content.Context;
 import android.text.Html;
-import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,120 +11,109 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mypetnews.R;
-import com.example.mypetnews.helper.CommentListManager;
-import com.example.mypetnews.helper.TextHelper;
-import com.example.mypetnews.listener.ClickListener;
-import com.example.mypetnews.viewmodel.CommentViewModel;
+import com.example.mypetnews.model.Comment;
+import com.example.mypetnews.util.Constants;
 
 import java.util.List;
 
-public final class CommentListAdapter extends RecyclerView.Adapter<ViewHolder> implements ClickListener {
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
-    private final static int INDENT_SIZE = 5;
-    private final Context mContext;
-    private final CommentListManager mCommentListManager;
+public final class CommentListAdapter extends RecyclerView.Adapter<CommentListAdapter.ViewHolder> {
 
-    public CommentListAdapter(Context context, List<CommentViewModel> comments) {
-        mContext = context;
-        mCommentListManager = new CommentListManager(comments);
+    private Context context;
+
+    private List<Comment> commentsList;
+
+    public CommentListAdapter(List<Comment> commentsList) {
+        this.commentsList = commentsList;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        LinearLayout view = (LinearLayout) LayoutInflater.from(parent.getContext()).inflate(
-                R.layout.comment, parent, false);
 
-        ViewHolder viewHolder = new ViewHolder(view);
-        viewHolder.setClickListener(this);
-
-        return viewHolder;
+        context = parent.getContext();
+        LayoutInflater inflater = LayoutInflater.from(context);
+        return new ViewHolder(inflater.inflate(R.layout.item_comment_list, parent, false));
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        CommentViewModel comment = mCommentListManager.getVisibleComments().get(position);
-        renderCommentIntoView(comment, holder.mView);
+
+        Comment comment = commentsList.get(position);
+
+        if (comment.getMargin() != null) {
+            ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) holder.itemView.getLayoutParams();
+            layoutParams.setMarginStart(layoutParams.getMarginStart() + comment.getMargin());
+        }
+
+        holder.textUserName.setText(comment.getAuthor());
+        holder.timeText.setText(Constants.getRelativeTime(comment.getTime()));
+        holder.commentText.setText(Html.fromHtml(comment.getText()));
+        if (comment.getCommentCount() <= 0) {
+            holder.answerView.setVisibility(View.GONE);
+        } else {
+            holder.titleAnswerText.setText(context.getResources().getText(R.string.answer_text));
+            holder.countAnswerText.setText(comment.getCommentCount().toString());
+            holder.answerView.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
     public int getItemCount() {
-        return mCommentListManager.getVisibleComments().size();
+        return commentsList.size();
     }
 
-    @Override
-    public void onClick(View view, int position, boolean isLongClick) {
-        mCommentListManager.toggleCommentAtPosition(position);
-        notifyDataSetChanged();
-    }
+    final class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-    private void renderCommentIntoView(CommentViewModel comment, View commentView) {
-        TextView usernameView = (TextView) commentView.findViewById(R.id.username);
-        TextView relativeTimeView = (TextView) commentView.findViewById(R.id.relativeTime);
-        final TextView textView = (TextView) commentView.findViewById(R.id.text);
-        LinearLayout indentView = (LinearLayout) commentView.findViewById(R.id.indent);
-        View childCommentsHidden = commentView.findViewById(R.id.hiddenChildCommentsMarker);
+        @BindView(R.id.text_user_name)
+        protected TextView textUserName;
 
-        usernameView.setText(comment.getUser());
-        relativeTimeView.setText(comment.getRelativeTime());
-        textView.setText(TextHelper.removeTrailingNewlinesFromText(Html.fromHtml(comment.getText())));
-        setupIndent(indentView, comment.getDepth());
-        setupClickListenerForTextView(textView);
+        @BindView(R.id.text_time)
+        protected TextView timeText;
 
-        if (comment.isCollapsed() && comment.getCommentCount() > 0) {
-            TextView commentCount = (TextView) commentView.findViewById(R.id.childCommentCount);
-            commentCount.setText(String.valueOf(comment.getCommentCount()));
-            childCommentsHidden.setVisibility(View.VISIBLE);
-        } else {
-            childCommentsHidden.setVisibility(View.GONE);
+        @BindView(R.id.text_comment)
+        protected TextView commentText;
+
+        @BindView(R.id.view_answer)
+        protected LinearLayout answerView;
+
+        @BindView(R.id.text_title_answer)
+        protected TextView titleAnswerText;
+
+        @BindView(R.id.text_count_answer)
+        protected TextView countAnswerText;
+
+        ViewHolder(View view) {
+            super(view);
+
+            ButterKnife.bind(this, view);
+            view.setOnClickListener(this);
         }
-    }
 
-    /**
-     * The comment body TextView is setup for autolinking. A special handler is used to ensure
-     * non-link clicks are captured and bubbled to the parent to simulate a click.
-     */
-    private void setupClickListenerForTextView(final TextView textView) {
-        textView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Non-autolinked text will have a value of -1 for selectionStart and selectionEnd
-                if (textView.getSelectionStart() == -1 && textView.getSelectionEnd() == -1) {
-                    View commentWrapper = (View) textView.getParent().getParent();
-                    commentWrapper.performClick();
+        @Override
+        public void onClick(View view) {
+            if (commentsList.get(getAdapterPosition()).getCommentCount() > 0) {
+                for (Comment comment : commentsList.get(getAdapterPosition()).getComments()) {
+                    if (comment.getCommentCount() > 0) {
+                        if (comment.getMargin() == null) {
+                            comment.setMargin(16);
+                        } else {
+                            comment.setMargin(comment.getMargin() + 20);
+                        }
+                        commentsList.add(getAdapterPosition() + 1, comment);
+                    } else {
+                        comment.setCommentCount(0);
+                        if (comment.getMargin() == null) {
+                            comment.setMargin(16);
+                        } else {
+                            comment.setMargin(comment.getMargin() + 20);
+                        }
+                        commentsList.add(getAdapterPosition() + 1, comment);
+                    }
                 }
+                notifyDataSetChanged();
             }
-        });
-    }
-
-    private void setupIndent(View indentView, int depth) {
-        LinearLayout indentBarView = (LinearLayout) indentView.findViewById(R.id.indent_bar);
-
-        if (depth <= 0) {
-            hideIndent(indentBarView, indentView);
-        } else {
-            positionAndColorIndentForDepth(indentBarView, indentView, depth);
         }
-    }
-
-    private void hideIndent(View indentBarView, View indentView) {
-        indentView.getLayoutParams().width = 0;
-
-        indentView.setVisibility(View.INVISIBLE);
-        indentBarView.setVisibility(View.INVISIBLE);
-    }
-
-    private void positionAndColorIndentForDepth(View indentBarView, View indentView, int depth) {
-        DisplayMetrics metrics = mContext.getResources().getDisplayMetrics();
-
-        int indentSize = depth * INDENT_SIZE;
-        indentView.getLayoutParams().width = Math.round(
-                TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, indentSize, metrics));
-
-        int[] indentColors = mContext.getResources().getIntArray(R.array.comment);
-        int indentColor = indentColors[depth % indentColors.length];
-        indentBarView.setBackgroundColor(indentColor);
-
-        indentView.setVisibility(View.VISIBLE);
-        indentBarView.setVisibility(View.VISIBLE);
     }
 }

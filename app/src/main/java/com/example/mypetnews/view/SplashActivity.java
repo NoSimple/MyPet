@@ -1,9 +1,9 @@
 package com.example.mypetnews.view;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.View;
@@ -13,18 +13,29 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.mypetnews.R;
+import com.example.mypetnews.model.ResponseModel;
+import com.example.mypetnews.model.Story;
+import com.example.mypetnews.network.ErrorType;
 import com.example.mypetnews.network.PathType;
+import com.example.mypetnews.network.RetrofitService;
 import com.example.mypetnews.util.Constants;
-import com.example.mypetnews.viewmodel.SplashViewModel;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SplashActivity extends AppCompatActivity {
 
-    private SplashViewModel splashViewModel;
+    private AppCompatActivity activity = this;
+
+    private SplashTask splashTask;
 
     @BindView(R.id.text_title)
     protected TextView titleText;
@@ -47,32 +58,74 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
 
         ButterKnife.bind(this);
-        splashViewModel = new ViewModelProvider(this).get(SplashViewModel.class);
 
         connectButton.setOnClickListener(view -> {
-            progress.setVisibility(View.VISIBLE);
-            request();
+            splashTask = new SplashTask();
+            splashTask.execute();
         });
 
-        request();
+        splashTask = new SplashTask();
+        splashTask.execute();
     }
 
-    private void request() {
+    class SplashTask extends AsyncTask<Void, ResponseModel, Void> {
 
-        splashViewModel.getStoriesListLiveData(PathType.TOP.getPathName()).observe(this, response -> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progress.setVisibility(View.VISIBLE);
+        }
 
-            if (response.getStories() != null) {
-                progress.setVisibility(View.GONE);
+        @Override
+        protected Void doInBackground(Void... params) {
 
-                Intent intent = new Intent(this, MainActivity.class);
-                intent.putParcelableArrayListExtra(Constants.RESPONSE, (ArrayList<? extends Parcelable>) response.getStories());
+            ResponseModel responseModel = new ResponseModel();
+            RetrofitService.getInstanceRepository().getStoriesListRequest(PathType.TOP.getPathName()).enqueue(new Callback<List<Story>>() {
+
+                @Override
+                public void onResponse(@NotNull Call<List<Story>> call, @NotNull Response<List<Story>> response) {
+                    if (response.body() != null) {
+                        responseModel.setStories(response.body());
+                        responseModel.setErrorType(null);
+                        publishProgress(responseModel);
+                    } else {
+                        responseModel.setStories(null);
+                        responseModel.setErrorType(ErrorType.EMPTY_DATA);
+                        publishProgress(responseModel);
+                    }
+                }
+
+                @Override
+                public void onFailure(@NotNull Call<List<Story>> call, Throwable t) {
+                    responseModel.setStories(null);
+                    responseModel.setErrorType(ErrorType.NETWORK_CONNECTION);
+                    publishProgress(responseModel);
+                }
+            });
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+        }
+
+        @Override
+        protected void onProgressUpdate(ResponseModel... values) {
+            super.onProgressUpdate(values);
+
+            if (values[0].getStories() != null) {
+                Intent intent = new Intent(activity, MainActivity.class);
+                intent.putParcelableArrayListExtra(Constants.RESPONSE, (ArrayList<? extends Parcelable>) values[0].getStories());
                 startActivity(intent);
             } else {
                 titleText.setVisibility(View.GONE);
-                errorText.setText(response.getErrorType().getErrorName());
+                errorText.setText(values[0].getErrorType().getErrorName());
                 errorBlock.setVisibility(View.VISIBLE);
-                progress.setVisibility(View.GONE);
             }
-        });
+
+            progress.setVisibility(View.GONE);
+        }
     }
 }

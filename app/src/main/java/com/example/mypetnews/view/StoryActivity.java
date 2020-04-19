@@ -1,240 +1,154 @@
 package com.example.mypetnews.view;
 
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.FragmentManager;
-import androidx.viewpager.widget.PagerAdapter;
-import androidx.viewpager.widget.ViewPager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.mypetnews.R;
-import com.example.mypetnews.adapter.StorySlidePagerAdapter;
-import com.example.mypetnews.util.ThemeHelper;
-import com.google.android.material.tabs.TabLayout;
+import com.example.mypetnews.model.Story;
+import com.example.mypetnews.util.Constants;
+import com.example.mypetnews.viewmodel.StoryViewModel;
+import com.example.mypetnews.widget.AppWidget;
 
-import java.util.concurrent.Callable;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
-public final class StoryActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener, TabLayout.OnTabSelectedListener {
-private final static String STORY_TITLE_INTENT_EXTRA_NAME = "storyTitle";
-private final static String STORY_ID_INTENT_EXTRA_NAME = "storyId";
-private TabLayout mTabLayout;
-private ViewPager mPager;
-private PagerAdapter mPagerAdapter;
-//private Single mGetStory;
 
-private enum Page {WEBVIEW, COMMENTS}
+public final class StoryActivity extends AppCompatActivity {
 
-    private Page mPage = Page.WEBVIEW;
+    private int storyId;
+    private String storyTitle;
+
+    private StoryViewModel storyViewModel;
+
+    private NewsFragment isNewsFragment;
+
+    @BindView(R.id.tool_bar)
+    protected Toolbar toolBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //ThemeHelper.applyTheme(this);
         setContentView(R.layout.activity_story);
 
-        //mGetStory = getStory();
-        mTabLayout = setupTabLayout();
-        mPagerAdapter = createPageAdapter(getSupportFragmentManager(), getStoryId());
-        mPager = setupPaging(mPagerAdapter);
+        ButterKnife.bind(this);
+        storyViewModel = new ViewModelProvider(this).get(StoryViewModel.class);
 
-        setupToolbar();
-        //loadArticleTitle();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-       // ThemeHelper.updateTheme(this);
-    }
-
-    private void setupToolbar() {
-        String storyTitle = getAnyProvidedStoryTitle();
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            getSupportActionBar().setTitle(storyTitle);
-            getSupportActionBar().setHomeButtonEnabled(true);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (savedInstanceState == null) {
+            Intent intent = getIntent();
+            storyId = intent.getIntExtra(Constants.ID, 0);
+            storyTitle = intent.getStringExtra(Constants.TITLE);
+        } else {
+            storyId = savedInstanceState.getInt(Constants.ID);
+            storyTitle = savedInstanceState.getString(Constants.TITLE);
         }
 
-    }
-
-    private TabLayout setupTabLayout() {
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-
-        tabLayout.addTab(tabLayout.newTab().setText(R.string.articleTabTitle));
-        tabLayout.addTab(tabLayout.newTab().setText(R.string.commentTabTitle));
-        tabLayout.setOnTabSelectedListener(this);
-
-        return tabLayout;
-    }
-
-    private StorySlidePagerAdapter createPageAdapter(FragmentManager fragmentManager, String storyId) {
-        return new StorySlidePagerAdapter(fragmentManager, storyId);
-    }
-
-    private ViewPager setupPaging(PagerAdapter pagerAdapter) {
-        ViewPager pager = (ViewPager) findViewById(R.id.pager);
-
-        pager.setAdapter(pagerAdapter);
-        pager.addOnPageChangeListener(this);
-
-        return pager;
-    }
-
-    private String getStoryId() {
-        Intent intent = this.getIntent();
-        String storyId = intent.getStringExtra(STORY_ID_INTENT_EXTRA_NAME);
-
-        if (storyId == null) {
-            final Uri data = intent.getData();
-            storyId = data.getQueryParameter("id");
-        }
-
-        return storyId;
-    }
-
-    private String getAnyProvidedStoryTitle() {
-        Intent intent = this.getIntent();
-        String storyTitle = intent.getStringExtra(STORY_TITLE_INTENT_EXTRA_NAME);
-
-        if (storyTitle == null) {
-            storyTitle = "";
-        }
-
-        return storyTitle;
-    }
-
-    /*private void loadArticleTitle() {
-        SingleObserver observer = new SingleObserver<Story>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-            }
-
-            @Override
-            public void onSuccess(Story story) {
-                getSupportActionBar().setTitle(story.getTitle());
-            }
-
-            @Override
-            public void onError(Throwable e) {
-            }
-        };
-
-        mGetStory.subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(observer);
-    }
-
-    private Single getStory() {
-        return Single.fromCallable(new Callable<Story>() {
-            @Override
-            public Story call() {
-                HexApplication application = (HexApplication) getApplication();
-                StoryService service = new StoryService(application.getRequestQueue(), application.apiBaseUrl);
-                return service.getStory(getStoryId());
-            }
-        });
-    }
-*/
-    @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+        initToolbar();
+        requestApi(storyId);
     }
 
     @Override
-    public void onPageSelected(int position) {
-        mTabLayout.getTabAt(position).select();
-        mPage = Page.values()[position];
-    }
-
-    @Override
-    public void onPageScrollStateChanged(int state) {
-    }
-
-    @Override
-    public void onTabSelected(TabLayout.Tab tab) {
-        mPager.setCurrentItem(tab.getPosition());
-    }
-
-    @Override
-    public void onTabUnselected(TabLayout.Tab tab) {
-    }
-
-    @Override
-    public void onTabReselected(TabLayout.Tab tab) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(Constants.ID, storyId);
+        outState.putString(Constants.TITLE, storyTitle);
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        //getMenuInflater().inflate(R.menu.activity_story_icons, menu);
+        getMenuInflater().inflate(R.menu.menu_widget, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            this.finish();
-        } /*else if (item.getItemId() == R.id.action_share) {
-            handleShareRequest();
-        }*/
 
+        switch (item.getItemId()) {
+            case R.id.action_widget: {
+                addWidget();
+                break;
+            }
+            case android.R.id.home: {
+                onBackPressed();
+                break;
+            }
+        }
         return true;
     }
 
-    /*private void handleShareRequest() {
-        SingleObserver observer = new SingleObserver<Story>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-            }
-
-            @Override
-            public void onSuccess(Story story) {
-                String intentMessage = getString(R.string.shareArticle);
-                String url = story.getUrl();
-
-                if (mPage.equals(Page.COMMENTS)) {
-                    intentMessage = getString(R.string.shareComments);
-                    url = story.getCommentsUrl();
-                }
-
-                Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                shareIntent.setType("text/plain");
-                shareIntent.putExtra(Intent.EXTRA_TEXT, url);
-                startActivity(Intent.createChooser(shareIntent, intentMessage));
-            }
-
-            @Override
-            public void onError(Throwable e) {
-            }
-        };
-
-        mGetStory.subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(observer);
-    }*/
-
     @Override
     public void onBackPressed() {
-        boolean backHandled = false;
+        boolean isBack = false;
 
-        if (mPage.equals(Page.WEBVIEW)) {
-            ArticleFragment storyListFragment = (ArticleFragment) (((StorySlidePagerAdapter)
-                    mPagerAdapter).getItem(0));
+        if (isNewsFragment != null) {
 
-            backHandled = storyListFragment.handleBack();
+            isBack = isNewsFragment.handleBack();
         }
 
-
-        if (!backHandled) {
+        if (!isBack) {
             super.onBackPressed();
         }
     }
 
+    private void initToolbar() {
+        setSupportActionBar(toolBar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(storyTitle);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
+        }
+    }
+
+    private void setFragment(Story story, String error) {
+
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        StoryFragment stepFragment = new StoryFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt(Constants.ID, storyId);
+        bundle.putParcelable(Constants.STORY, story);
+        bundle.putString(Constants.ERROR, error);
+        stepFragment.setArguments(bundle);
+        transaction.replace(R.id.fragment_container, stepFragment);
+        transaction.commit();
+    }
+
+    public void requestApi(int id) {
+
+        storyViewModel.getStoriesListLiveData(id).observe(this, response -> {
+
+            if (response.getStory() != null) {
+                setFragment(response.getStory(), null);
+            } else {
+                setFragment(null, response.getErrorType().getErrorName());
+            }
+        });
+    }
+
+    public void setNewsFragment(NewsFragment newsFragment) {
+        isNewsFragment = newsFragment;
+    }
+
+    private void addWidget() {
+
+        Context context = getApplicationContext();
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        ComponentName thisWidget = new ComponentName(context, AppWidget.class);
+        int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
+        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_stories_list);
+
+        Toast.makeText(this, getString(R.string.save_widget_text), Toast.LENGTH_LONG).show();
+    }
 }

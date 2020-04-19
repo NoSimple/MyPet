@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Date;
 import java.util.List;
 
 public final class Story implements Parcelable {
@@ -33,7 +34,7 @@ public final class Story implements Parcelable {
     private String domain;
     @SerializedName("time")
     @Expose
-    private String time;
+    private Date time;
     @SerializedName("score")
     @Expose
     private Integer score;
@@ -57,7 +58,8 @@ public final class Story implements Parcelable {
             commentCount = in.readInt();
         }
         domain = in.readString();
-        time = in.readString();
+        long tmpDate = in.readLong();
+        this.time = tmpDate == -1 ? null : new Date(tmpDate);
         if (in.readByte() == 0) {
             score = null;
         } else {
@@ -134,11 +136,11 @@ public final class Story implements Parcelable {
         this.domain = domain;
     }
 
-    public String getTime() {
+    public Date getTime() {
         return time;
     }
 
-    public void setTime(String time) {
+    public void setTime(Date time) {
         this.time = time;
     }
 
@@ -182,7 +184,7 @@ public final class Story implements Parcelable {
             parcel.writeInt(commentCount);
         }
         parcel.writeString(domain);
-        parcel.writeString(time);
+        parcel.writeLong(time != null ? time.getTime() : -1);
         if (score == null) {
             parcel.writeByte((byte) 0);
         } else {
