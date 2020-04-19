@@ -1,3 +1,23 @@
 <resources>
-    <string name="app_name">MyPet</string>
+    <string name="appName">MyPetNews</string>
+
+    <string name="splash_title_text">Hacker News</string>
+    <string name="button_connect">Try again</string>
+    <string name="about_menu_text">About</string>
+    <string name="widget_menu_text">Widget</string>
+    <string name="save_widget_text">Saved widget</string>
+    <string name="top_title_text">Top</string>
+    <string name="ask_title_text">Ask</string>
+    <string name="new_title_text">New</string>
+    <string name="show_title_text">Show</string>
+    <string name="jobs_title_text">Jobs</string>
+    <string name="about_title_text">About</string>
+    <string name="news_title_text">Article</string>
+    <string name="comments_title_text">Comments</string>
+    <string name="shareComments">Share Comments</string>
+    <string name="share_text">Share Article</string>
+    <string name="answer_text">Answer</string>
+    <string name="production_text">A NoSimple production</string>
+    <string name="story_empty_text">Empty widget</string>
+
 </resources>
