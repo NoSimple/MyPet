@@ -13,8 +13,6 @@ import com.example.mypetnews.model.Story;
 import com.example.mypetnews.util.Constants;
 import com.squareup.picasso.Picasso;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -13,11 +14,13 @@
         android:clickable="true"
         android:focusable="true"
         android:orientation="horizontal"
-        android:padding="16dp">
+        android:padding="16dp"
+        tools:ignore="UseCompoundDrawables">
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:contentDescription="@string/top_image_description_text"
             app:srcCompat="@drawable/upward_arrow" />
 
         <TextView
@@ -37,11 +40,13 @@
         android:clickable="true"
         android:focusable="true"
         android:orientation="horizontal"
-        android:padding="16dp">
+        android:padding="16dp"
+        tools:ignore="UseCompoundDrawables">
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:contentDescription="@string/new_image_description_text"
             app:srcCompat="@drawable/new_releases" />
 
         <TextView
@@ -61,11 +66,13 @@
         android:clickable="true"
         android:focusable="true"
         android:orientation="horizontal"
-        android:padding="16dp">
+        android:padding="16dp"
+        tools:ignore="UseCompoundDrawables">
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:contentDescription="@string/ask_image_description_text"
             app:srcCompat="@drawable/question_answer" />
 
         <TextView
@@ -85,11 +92,13 @@
         android:clickable="true"
         android:focusable="true"
         android:orientation="horizontal"
-        android:padding="16dp">
+        android:padding="16dp"
+        tools:ignore="UseCompoundDrawables">
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:contentDescription="@string/show_image_description_text"
             app:srcCompat="@drawable/group" />
 
         <TextView
@@ -109,11 +118,13 @@
         android:clickable="true"
         android:focusable="true"
         android:orientation="horizontal"
-        android:padding="16dp">
+        android:padding="16dp"
+        tools:ignore="UseCompoundDrawables">
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:contentDescription="@string/jobs_image_description_text"
             app:srcCompat="@drawable/work" />
 
         <TextView

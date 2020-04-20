@@ -22,16 +22,20 @@ import android.widget.TextView;
 import com.example.mypetnews.R;
 import com.example.mypetnews.adapter.ItemClickListener;
 import com.example.mypetnews.adapter.StoriesListAdapter;
-import com.example.mypetnews.data.DataPreferences;
+import com.example.mypetnews.data.room.StoryDao;
+import com.example.mypetnews.data.room.StoryEntity;
 import com.example.mypetnews.model.Story;
 import com.example.mypetnews.network.PathType;
 import com.example.mypetnews.util.Constants;
+import com.example.mypetnews.util.ConverterDate;
+import com.example.mypetnews.util.MainApplication;
 import com.example.mypetnews.viewmodel.MainViewModel;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 import butterknife.BindBool;
 import butterknife.BindView;
@@ -137,7 +141,23 @@ public final class MainActivity extends AppCompatActivity implements ItemClickLi
         if (isTablet) {
             initFragment(0);
         } else {
-            DataPreferences.setRecipePreference(this, storiesList.get(position));
+
+            Executors.newSingleThreadExecutor().execute(() -> {
+                StoryDao storyDao = MainApplication.getMainApplication().getDataBase().storyDao();
+                storyDao.deleteStory();
+                StoryEntity storyEntity = new StoryEntity();
+                Story story = storiesList.get(position);
+
+                storyEntity.id = story.getId();
+                storyEntity.author = story.getAuthor();
+                storyEntity.time = ConverterDate.dateToTime(story.getTime());
+                storyEntity.title = story.getTitle();
+                storyEntity.domain = story.getDomain();
+                storyEntity.score = story.getScore();
+                storyEntity.commentCount = story.getCommentCount();
+
+                storyDao.insertStory(storyEntity);
+            });
 
             Intent intent = new Intent(this, StoryActivity.class);
             intent.putExtra(Constants.ID, storiesList.get(position).getId());
