@@ -18,7 +18,7 @@ android {
         release {
             keyAlias 'key'
             keyPassword '12345qwerty'
-            storeFile file('../MyPetNews/app/mypetnewskeystore.jks')
+            storeFile file('../MyPetNews/app/keystore/mypetnewskeystore.jks')
             storePassword '12345qwerty'
         }
     }
