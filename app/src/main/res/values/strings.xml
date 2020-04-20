@@ -19,5 +19,18 @@
     <string name="answer_text">Answer</string>
     <string name="production_text">A NoSimple production</string>
     <string name="story_empty_text">Empty widget</string>
+    <string name="version_name_text">Version name:</string>
+    <string name="version_code_text">Version code:</string>
+    <string name="top_image_description_text">Top image</string>
+    <string name="new_image_description_text">New image</string>
+    <string name="ask_image_description_text">Ask image</string>
+    <string name="show_image_description_text">Show image</string>
+    <string name="jobs_image_description_text">Jobs image</string>
+    <string name="story_image_description_text">Story image</string>
+    <string name="comment_count_description_text">Comment count</string>
+    <string name="score_description_text">Score</string>
+    <string name="image_description_text">Version code:</string>
+
+    <string name="banner_ad_id">ca-app-pub-3940256099942544/6300978111</string>
 
 </resources>

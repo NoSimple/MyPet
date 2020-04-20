@@ -9,7 +9,8 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:paddingTop="8dp"
-        android:paddingBottom="8dp">
+        android:paddingBottom="8dp"
+        tools:ignore="UselessParent">
 
         <ImageView
             android:id="@+id/image_story"
@@ -17,6 +18,7 @@
             android:layout_height="70dp"
             android:layout_gravity="center"
             android:layout_margin="4dp"
+            android:contentDescription="@string/story_image_description_text"
             android:src="@drawable/ic_image" />
 
         <LinearLayout
@@ -39,6 +41,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="2dp"
                     android:layout_marginEnd="8dp"
+                    android:contentDescription="@string/score_description_text"
                     android:drawableStart="@drawable/ic_plus_one"
                     android:drawablePadding="4dp"
                     tools:text="0" />
@@ -48,6 +51,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="2dp"
+                    android:contentDescription="@string/comment_count_description_text"
                     android:drawableStart="@drawable/ic_message"
                     android:drawablePadding="4dp"
                     tools:text="0" />
